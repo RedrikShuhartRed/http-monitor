@@ -15,22 +15,25 @@ func ConnectDb() {
 	if err != nil {
 		panic(err)
 	}
+
 	var databaseExists bool
 	err = dbs.QueryRow("SELECT EXISTS(SELECT 1 FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = 'test');").Scan(&databaseExists)
 	if err != nil {
 		panic(err)
 
 	}
-	if databaseExists {
-		_, err = dbs.Exec("DROP database test")
+
+	if !databaseExists {
+		_, err = dbs.Exec("CREATE database test")
 		if err != nil {
 			panic(err)
 		}
 	}
-	_, err = dbs.Exec("CREATE database test")
-	if err != nil {
-		panic(err)
-	}
+	// _, err = dbs.Exec("CREATE database test")
+	// if err != nil {
+	// 	panic(err)
+	// }
+
 	_, err = dbs.Exec("USE test")
 	if err != nil {
 		panic(err)
