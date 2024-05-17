@@ -10,6 +10,13 @@ var (
 	db *sql.DB
 )
 
+func CloseDB(db *sql.DB) {
+	err := db.Close()
+	if err != nil {
+		panic(err)
+	}
+}
+
 func ConnectDb() {
 	dbs, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/")
 	if err != nil {

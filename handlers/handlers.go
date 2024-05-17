@@ -1,11 +1,11 @@
 package handlers
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/RedrikShuhartRed/http-monitor/db"
 	"github.com/RedrikShuhartRed/http-monitor/model"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -13,18 +13,11 @@ import (
 
 var NewInfo model.Info
 
-//var dbs *sql.DB
+func Get(link string, dbs *sql.DB) {
 
-// func init() {
-// 	db.ConnectDb()
-// 	dbs = db.GetDB()
-// }
-
-func Get(link string) {
-
-	db.ConnectDb()
-	dbs := db.GetDB()
-	defer dbs.Close()
+	// db.ConnectDb()
+	// dbs := db.GetDB()
+	// defer dbs.Close()
 	NewInfo.URL = link
 	TimeRequest := time.Now()
 	NewInfo.TimeRequest = TimeRequest.Format("2006-01-02 15:04:05")
@@ -42,6 +35,10 @@ func Get(link string) {
 	NewInfo.Duration = TimeResponse.Sub(TimeRequest).String()
 	fmt.Println(NewInfo)
 
+	_, err = dbs.Exec("USE test")
+	if err != nil {
+		panic(err)
+	}
 	_, err = dbs.Exec("INSERT INTO monitor (URL, TimeRequest, TimeResponse, CodeResponse, Duration) VALUES (?, ?, ?,?,?)", NewInfo.URL, NewInfo.TimeRequest, NewInfo.TimeResponse, NewInfo.CodeResponse, NewInfo.Duration)
 	if err != nil {
 		panic(err)

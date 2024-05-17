@@ -5,11 +5,14 @@ import (
 	"os"
 	"sync"
 
+	"github.com/RedrikShuhartRed/http-monitor/db"
 	"github.com/RedrikShuhartRed/http-monitor/handlers"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
+	db.ConnectDb()
+	dbs := db.GetDB()
 	var wg sync.WaitGroup
 
 	link := os.Args
@@ -22,10 +25,12 @@ func main() {
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
 		go func() {
-			handlers.Get(url)
+			handlers.Get(url, dbs)
 			defer wg.Done()
 		}()
 
 	}
 	wg.Wait()
+	db.CloseDB(dbs)
+
 }
