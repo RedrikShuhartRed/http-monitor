@@ -15,12 +15,9 @@ var NewInfo model.Info
 
 func Get(link string, dbs *sql.DB) {
 
-	// db.ConnectDb()
-	// dbs := db.GetDB()
-	// defer dbs.Close()
 	NewInfo.URL = link
 	TimeRequest := time.Now()
-	NewInfo.TimeRequest = TimeRequest.Format("2006-01-02 15:04:05")
+	NewInfo.TimeRequest = TimeRequest.Format("2006-01-02 15:04:05.000")
 	resp, err := http.Get(NewInfo.URL)
 	if err != nil {
 		fmt.Println("Check the URL")
@@ -29,9 +26,10 @@ func Get(link string, dbs *sql.DB) {
 	}
 
 	defer resp.Body.Close()
-	NewInfo.CodeResponse = resp.StatusCode
 	TimeResponse := time.Now()
-	NewInfo.TimeResponse = TimeResponse.Format("2006-01-02 15:04:05")
+	NewInfo.CodeResponse = resp.StatusCode
+
+	NewInfo.TimeResponse = TimeResponse.Format("2006-01-02 15:04:05.000")
 	NewInfo.Duration = TimeResponse.Sub(TimeRequest).String()
 	fmt.Println(NewInfo)
 
