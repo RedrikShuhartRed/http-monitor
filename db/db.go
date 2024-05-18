@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"log"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -10,40 +11,42 @@ var (
 	db *sql.DB
 )
 
-func CloseDB(db *sql.DB) {
+func CloseDB(db *sql.DB) error {
 	err := db.Close()
 	if err != nil {
-		panic(err)
+		log.Printf("Error while CloseDB(): %s\n", err)
+		return err
 	}
+	return nil
 }
 
-func ConnectDb() {
+func ConnectDb() error {
 	dbs, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/")
 	if err != nil {
-		panic(err)
+		log.Printf("Error while ConnectDB() : %s\n", err)
+		return err
 	}
 
 	var databaseExists bool
 	err = dbs.QueryRow("SELECT EXISTS(SELECT 1 FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = 'test');").Scan(&databaseExists)
 	if err != nil {
-		panic(err)
+		log.Printf("Error while connect DB: %s\n", err)
+		return err
 
 	}
 
 	if !databaseExists {
 		_, err = dbs.Exec("CREATE database test")
 		if err != nil {
-			panic(err)
+			log.Printf("Error while create db: %s\n", err)
+			return err
 		}
 	}
-	// _, err = dbs.Exec("CREATE database test")
-	// if err != nil {
-	// 	panic(err)
-	// }
 
 	_, err = dbs.Exec("USE test")
 	if err != nil {
-		panic(err)
+		log.Printf("Error while connect DB: %s\n", err)
+		return err
 	}
 
 	_, err = dbs.Exec(`
@@ -56,10 +59,12 @@ func ConnectDb() {
     )
 `)
 	if err != nil {
-		panic(err)
+		log.Printf("Error while create table: %s\n", err)
+		return err
 	}
 	db = dbs
 
+	return nil
 }
 func GetDB() *sql.DB {
 	return db

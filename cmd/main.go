@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"sync"
 
@@ -11,6 +12,7 @@ import (
 )
 
 func main() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	db.ConnectDb()
 	dbs := db.GetDB()
 	var wg sync.WaitGroup
@@ -31,6 +33,8 @@ func main() {
 
 	}
 	wg.Wait()
+	handlers.Average(url, dbs)
+
 	db.CloseDB(dbs)
 
 }
